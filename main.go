@@ -25,7 +25,8 @@ func writeFile(w http.ResponseWriter, r *http.Request) {
 	filePath := r.FormValue("filePath")
 	fileContent := r.FormValue("fileContent")
 	logrus.WithFields(logrus.Fields{
-		"filePath": filePath,
+		"filePath":    filePath,
+		"fileContent": fileContent,
 	}).Info("Writing file")
 
 	err := ioutil.WriteFile(filePath, []byte(fileContent), 0644)
