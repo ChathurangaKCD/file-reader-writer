@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -22,6 +24,9 @@ func writeFile(w http.ResponseWriter, r *http.Request) {
 
 	filePath := r.FormValue("filePath")
 	fileContent := r.FormValue("fileContent")
+	logrus.WithFields(logrus.Fields{
+		"filePath": filePath,
+	}).Info("Writing file")
 
 	err := ioutil.WriteFile(filePath, []byte(fileContent), 0644)
 	if err != nil {
@@ -39,7 +44,10 @@ func readFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := r.FormValue("filePath")
-	fmt.Printf("path: %s", filePath)
+	logrus.WithFields(logrus.Fields{
+		"filePath": filePath,
+	}).Info("Reading file")
+
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
