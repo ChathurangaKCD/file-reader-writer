@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/util/uuid"
 )
 
 var serverId string
