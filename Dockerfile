@@ -23,5 +23,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/
 FROM alpine
 COPY --from=build-env /go/bin/app /go/bin/app
 
+RUN mkdir /voldir && chown -R choreouser:choreo /voldir
+RUN mkdir /voldir2 && chown -R choreouser:choreo /voldir2
+
 USER 10014
 ENTRYPOINT ["/go/bin/app"]
