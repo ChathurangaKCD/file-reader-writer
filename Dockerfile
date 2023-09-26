@@ -22,8 +22,5 @@ COPY --from=build-env /go/bin/app /go/bin/app
 RUN addgroup -g 10014 choreo && \
     adduser  --disabled-password  --no-create-home --uid 10014 --ingroup choreo choreouser
 
-RUN mkdir /voldir && chown -R choreouser:choreo /voldir
-RUN mkdir /voldir2 && chown -R choreouser:choreo /voldir2
-
 USER 10014
 ENTRYPOINT ["/go/bin/app"]
