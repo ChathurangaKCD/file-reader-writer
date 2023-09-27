@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -155,8 +157,8 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 
 	err := os.Remove(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			http.Error(w, "File not found", http.StatusNotFound)
+		if errors.Is(err, fs.ErrNotExist) {
+			http.Error(w, fmt.Sprintf("File not found: %s", err), http.StatusNotFound)
 			return
 		}
 		http.Error(w, fmt.Sprintf("Unable to delete file: %s", err.Error()), http.StatusInternalServerError)
