@@ -93,8 +93,9 @@ func readFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Unable to read file: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
-
-	w.Write(data)
+	writeJSON(w, "File read successfully", requestId, map[string]interface{}{
+		"fileContent": string(data),
+	})
 }
 
 func listFiles(w http.ResponseWriter, r *http.Request) {
@@ -117,19 +118,21 @@ func listFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fileNames []string
+	var fileInfoList []map[string]interface{}
 	for _, file := range files {
-		fileNames = append(fileNames, file.Name())
+		filePath := path.Join(dirPath, file.Name())
+		fileInfo, err := os.Stat(filePath)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Unable to get info for file %s: %s", filePath, err.Error()), http.StatusInternalServerError)
+			return
+		}
+		fileInfoList = append(fileInfoList, map[string]interface{}{
+			"fileName": file.Name(),
+			"size":     fileInfo.Size(), // Size in bytes
+		})
 	}
 
-	// Return the file names as a JSON response
-	responseData, err := json.Marshal(fileNames)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to create JSON response: %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	writeJSON(w, "Files listed successfully", requestId, responseData)
+	writeJSON(w, "Files listed successfully", requestId, fileInfoList)
 }
 
 // New function to handle file deletion
