@@ -17,6 +17,9 @@ var serverId string
 
 func main() {
 	serverId = generateUUID()
+	logrus.WithFields(logrus.Fields{
+		"serverId": serverId,
+	}).Info("Starting server")
 	http.HandleFunc("/writeFile", writeFile)
 	http.HandleFunc("/readFile", readFile)
 	http.HandleFunc("/listFiles", listFiles)
