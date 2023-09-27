@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
+	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -18,6 +21,7 @@ func main() {
 	http.HandleFunc("/readFile", readFile)
 	http.HandleFunc("/listFiles", listFiles)
 	http.HandleFunc("/deleteFile", deleteFile)
+	http.HandleFunc("/generateFiles", generateFiles)
 
 	http.ListenAndServe(":8080", nil)
 }
@@ -153,4 +157,55 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, "File deleted successfully", requestId, nil)
+}
+
+func generateFiles(w http.ResponseWriter, r *http.Request) {
+	requestId := generateUUID()
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	dirPath := r.FormValue("dirPath")
+	sizeInMBStr := r.FormValue("sizeInMB")
+	sizeInMB, err := strconv.Atoi(sizeInMBStr)
+	if err != nil {
+		http.Error(w, "Invalid size value", http.StatusBadRequest)
+		return
+	}
+
+	filesToGenerate := sizeInMB / 10
+	remainingSize := sizeInMB % 10
+
+	prefix := strings.ReplaceAll(generateUUID(), "-", "")
+
+	for i := 0; i < filesToGenerate; i++ {
+		filePath := path.Join(dirPath, fmt.Sprintf("%s_file_%d.txt", prefix, i+1))
+		content := generateContentSize(10) // 10 MB
+		err = os.WriteFile(filePath, []byte(content), 0644)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Unable to write to file: %s", err.Error()), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if remainingSize > 0 {
+		filePath := path.Join(dirPath, fmt.Sprintf("%s_file_last.txt", prefix))
+		content := generateContentSize(remainingSize)
+		err = os.WriteFile(filePath, []byte(content), 0644)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Unable to write to file: %s", err.Error()), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	writeJSON(w, "Files generated successfully", requestId, nil)
+}
+
+func generateContentSize(sizeInMB int) string {
+	const chunk = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" // 36 bytes
+	chunkSize := len(chunk)
+	totalSize := sizeInMB * 1024 * 1024
+	repeatCount := totalSize / chunkSize
+	return strings.Repeat(chunk, repeatCount)
 }
