@@ -155,7 +155,7 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 		"serverId":  serverId,
 	}).Info("Deleting file")
 
-	err := os.Remove(filePath)
+	err := os.RemoveAll(filePath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			http.Error(w, fmt.Sprintf("File not found: %s", err), http.StatusNotFound)
