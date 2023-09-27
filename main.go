@@ -148,7 +148,7 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := r.FormValue("filePath")
+	filePath := r.URL.Query().Get("filePath")
 	logrus.WithFields(logrus.Fields{
 		"filePath":  filePath,
 		"requestId": requestId,
