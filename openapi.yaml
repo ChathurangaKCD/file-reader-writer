@@ -88,16 +88,13 @@ paths:
   /deleteFile:
     delete:
       summary: Deletes a file
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                filePath:
-                  type: string
-                  description: Path to the file to delete
+      parameters:
+        - in: query
+          name: filePath
+          required: true
+          schema:
+            type: string
+          description: Path to the file to delete
       responses:
         "200":
           description: File deleted successfully
