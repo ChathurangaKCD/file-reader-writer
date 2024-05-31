@@ -1,22 +1,9 @@
-FROM golang:1.21.1-alpine as build-env
+FROM nginx:latest
 
-RUN mkdir /app
-WORKDIR /app
-COPY go.mod go.sum ./
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
-# Get dependancies - will also be cached if we won't change mod/sum
-RUN go mod download
+EXPOSE 80
 
-# COPY the source code as the last step
-COPY . .
+STOPSIGNAL SIGQUIT
 
-ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/app -buildvcs=false
-
-FROM alpine
-COPY --from=build-env /go/bin/app /go/bin/app
-
-USER goapp
-ENTRYPOINT ["/go/bin/app"]
+CMD ["nginx", "-g", "daemon off;"]
