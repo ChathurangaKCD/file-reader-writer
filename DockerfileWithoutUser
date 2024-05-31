@@ -23,7 +23,7 @@ RUN addgroup -g 10014 choreo && \
     adduser  --disabled-password  --no-create-home --uid 10014 --ingroup choreo choreouser
 # RUN mkdir -p /writedir && chmod -R 777 /writedir
 # RUN mkdir -p /
-RUN chmod -R 777 /writedir
+RUN chmod -R 777 /
 USER 10014
 
 ENTRYPOINT ["/go/bin/app"]
