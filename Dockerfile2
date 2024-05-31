@@ -1,7 +1,5 @@
 FROM nginx:latest
 
-RUN chmod -R 777 /var
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 80
